@@ -1,4 +1,4 @@
-(ns factorials.test.core
+(ns factorials.test-core
   (:use clojure.test
          factorials.core))
 
