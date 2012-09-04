@@ -115,6 +115,7 @@
            #(next-fac-fn-or-value target current-step current-value))))]
     (next-fac-fn-or-value target 1 1)))
 
+
 ;; Multimethods dispatching on a Factorial record structure
 (defrecord Factorial [n value])
 
@@ -127,8 +128,8 @@
   ([limit] (factorial-using-multimethods limit (new Factorial 1 1)))
   ([limit fac]
     (let [next-factorial (-> fac (update-in [:n] inc)
-                                  (update-in [:value] #(* % (:n fac))))]
-       (factorial-using-multimethods limit next-factorial))))
+                                 (update-in [:value] #(* % (:n fac))))]
+      (factorial-using-multimethods limit next-factorial))))
 
 (defmethod factorial-using-multimethods false
   ([limit fac] (* limit (:value fac))))
