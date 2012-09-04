@@ -115,9 +115,27 @@
            #(next-fac-fn-or-value target current-step current-value))))]
     (next-fac-fn-or-value target 1 1)))
 
-(import 'example.Factorial)
+;; Multimethods dispatching on a Factorial record structure
+(defrecord Factorial [n value])
+
+;; Map destructuring: http://blog.jayfields.com/2010/07/clojure-destructuring.html
+(defmulti factorial-using-multimethods
+  (fn ([limit] true)
+      ([limit {:keys [n]}] (< n limit))))
+
+(defmethod factorial-using-multimethods true
+  ([limit] (factorial-using-multimethods limit (new Factorial 1 1)))
+  ([limit fac]
+    (let [next-factorial (-> fac (update-in [:n] inc)
+                                  (update-in [:value] #(* % (:n fac))))]
+       (factorial-using-multimethods limit next-factorial))))
+
+(defmethod factorial-using-multimethods false
+  ([limit fac] (* limit (:value fac))))
+
+
 (defn factorial-using-javainterop [target]
-  (Factorial/calculate 5))
+  (example.Factorial/calculate 5))
 
 (import 'example.Factorial$Builder)
 (defn factorial-using-javainterop-and-pipeline [target]

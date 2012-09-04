@@ -21,6 +21,7 @@
       (is (== fac ((factorial-using-pvalues-reduce 5 2)))) ;; macro
       (is (== fac ((factorial-using-pcalls-reduce 5 2)))) ;; macro
       (is (== fac (trampoline (factorial-for-trampoline 5))))
+      (is (== fac (factorial-using-multimethods 5)))
       (is (== fac (factorial-using-javainterop 5)))
       (is (== fac (factorial-using-javainterop-and-pipeline 5)))
       (is (== fac (-> (newFactorialComputer 5) .compute)))
