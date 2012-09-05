@@ -1,8 +1,11 @@
 # Exploring Clojure with Factorials
 
-This project demonstrates a variety of of Clojure language features and library functions using factorial computation as an example.
+This project demonstrates a variety of of Clojure language features
+and library functions using factorial computation as an example.
 
-Many Clojure tutorials (and CS textbooks, for that matter) use factorial computation to demonstrate recursion.  I implemented such a function in Clojure and thought: "why stop here?"
+Many Clojure tutorials (and CS textbooks, for that matter) use
+factorial computation to teach recursion.  I implemented such a
+function in Clojure and thought: "why stop there?"
 
 ## Inventory
 
@@ -41,6 +44,15 @@ Buggy or just wrong functions that still "work."
 This project builds with [Leiningen 2](https://github.com/technomancy/leiningen). Note that it includes some Java sources (for the interop examples).
 
 Running `lein test` or `lein repl` will compile said Java sources.
+
+Also, the source code comments are formatted for [Marginalia](http://fogus.me/fun/marginalia/). Configure your
+profile to use the lein-marginalia plugin and run `lein marg` to generate documentation.
+
+# GitHub Page
+
+This project also has a GitHub page hosting the generated Marginalia documentation.  Point your browser to
+
+[http://noahlz.github.com/factorials](http://noahlz.github.com/factorials)
 
 # License
 
