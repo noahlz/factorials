@@ -1,6 +1,6 @@
 # Exploring Clojure with Factorials
 
-This project demonstrates a variety of of Clojure language features
+This project demonstrates a variety of of [Clojure](http://clojure.org) language features
 and library functions using factorial computation as an example.
 
 Many Clojure tutorials (and CS textbooks, for that matter) use
