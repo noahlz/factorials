@@ -58,5 +58,5 @@ This project also has a GitHub page hosting the generated Marginalia documentati
 
 I haven't decided on an OSS license (do projects like this really need one?). Eclipse Public License, maybe?
 
-Copyright 2012 Noah Zucker (nzucker@gmail.com / @noahlz)
+Copyright 2012 Noah Zucker (nzucker@gmail.com / [@noahlz](http://twitter.com/noahlz)
 
