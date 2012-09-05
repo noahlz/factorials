@@ -292,3 +292,23 @@
       (swap! res * (swap! a inc)))
     @res))
 
+;; Finally, an attempt to compute a factorial using an `agent` that recursively
+;; submits computation tasks to itself
+;;
+;; This approach sometimes fails due to a race condition between
+;; the recursive (and asychronous) `send-off` and the `await` call.
+;;
+;;     (for [x (range 10)] (factorial-using-agent-recursive 5))
+;;     => (2 4 3 120 2 120 120 120 120 2)
+;;     (for [x (range 10)] (factorial-using-agent-recursive 5))
+;;     => (2 2 2 3 2 2 3 2 120 2)
+(defn factorial-using-agent-recursive [x]
+  (let [a (agent 1)]
+    (letfn [(calc  [n limit total]
+               (if (< n limit)
+                 (let [next-n (inc n)]
+                   (send-off *agent* calc limit (* total next-n))
+                   next-n)
+                 total))]
+      (await (send-off a calc x 1)))
+    @a))

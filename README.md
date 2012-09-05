@@ -37,7 +37,7 @@ Buggy or just wrong functions that still "work."
 1. (Mis-)using `def` `do` and `dotimes` (defective code)
 1. (Mis-)using `def` `do` and `while` (yet more defective code)
 1. (Mis-)using `while` `atom` and `swap` (not precisesly defective, but not a good use of Atoms).
-
+1. An attempt with `agent` and recursive `send-off` calls, which often fails due to a race condition with `await`
 
 # Building
 
