@@ -94,7 +94,7 @@
 ;; Using `agent` `send` and `await`
 ;;
 ;; I found that `(send result * p)` doesn't work here, because of how `*` and `send` are overloaded.
-;; Perhaps this is obvious, but I puzzled over it for while).
+;; Perhaps this is obvious, but I puzzled over it for while.
 ;;
 ;; Also: per Joy of Clojure (§11.3.5) this is not the best use case for Agents (particularly
 ;; the `await` call at the end).
@@ -156,15 +156,22 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ### Multimethods
+;;
+;; I also thought of a way to compute a factorial using multimethods
+;; and some recursion.
 
-;; Define a "struct" (which actually becomes a full-fledged Java class)
+;; First define a "struct" (which actually becomes a full-fledged Java class)
 ;; that has the fields `n` and `value`
+;;
+;; A tuple in the form of `[n value]` would also work here, but (to be honest) I wanted to use
+;; `defrecord` in at least one of these examples.
 (defrecord Factorial [n value])
 
 ;; Define the root of the multimethod, which dispatches based on "true" or "false," where
 ;; "false" means we reached the end of our factorial computation.
 ;;
-;; (Highly recommended: Jay Fields' terrific blog entry on [Map Destructuring](http://blog.jayfields.com/2010/07/clojure-destructuring.html))
+;; (Highly recommended: Jay Fields' terrific blog entry on
+;; [Map Destructuring](http://blog.jayfields.com/2010/07/clojure-destructuring.html))
 (defmulti factorial-using-multimethods
   (fn ([limit] true)
       ([limit {:keys [n]}] (< n limit))))
