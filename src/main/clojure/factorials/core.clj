@@ -231,7 +231,7 @@
 )
 ;; which is equivalent to
 (comment
-  => (.compute (.build (.factorial (example.Factorial$Builder.) 5)))
+  => (.compute (.build (.factorial (example.Factorial$Builder.) target)))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
