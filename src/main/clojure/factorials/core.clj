@@ -3,7 +3,7 @@
 ;;
 ;; _"[Fork me on on GitHub](http://github.com/noahlz/factorials)!"_
 ;;
-;; This project demonstrates a variety of of Clojure language features
+;; This project demonstrates a variety of of [Clojure](http://clojure.org) language features
 ;; and library functions using factorial computation as an example.
 ;;
 ;; Many Clojure tutorials (and CS textbooks, for that matter) use
@@ -94,7 +94,7 @@
 ;; Using `agent` `send` and `await`
 ;;
 ;; I found that `(send result * p)` doesn't work here, because of how `*` and `send` are overloaded.
-;; Perhaps this is obvious, but I puzzled over it for while.
+;; Perhaps this is obvious, but I puzzled over it for a while.
 ;;
 ;; Also: per Joy of Clojure (§11.3.5) this is not the best use case for Agents (particularly
 ;; the `await` call at the end).
@@ -163,7 +163,7 @@
 ;; First define a "struct" (which actually becomes a full-fledged Java class)
 ;; that has the fields `n` and `value`
 ;;
-;; A tuple in the form of `[n value]` would also work here, but (to be honest) I wanted to use
+;; A tuple in the form of `{:n 1 :value 1}` would also have worked here, but (to be honest) I wanted to use
 ;; `defrecord` in at least one of these examples.
 (defrecord Factorial [n value])
 
