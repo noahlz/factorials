@@ -62,7 +62,7 @@
 ;;
 ;; Similar to the previous function, but note the macro output.
 ;;
-;;      (macroexpand `(factorial-using-macro 10))
+;;      (macroexpand `(factorial-function-macro 10))
 ;;      => (fn* ([] (clojure.core/* 1 2 3 4 5 6 7 8 9 10)))
 ;;
 (defmacro factorial-function-macro [x]
