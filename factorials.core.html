@@ -3075,7 +3075,7 @@ a fixed factorial value on-demand.</p>
 
 <p>Similar to the previous function, but note the macro output.</p>
 
-<pre><code> (macroexpand `(factorial-using-macro 10))
+<pre><code> (macroexpand `(factorial-function-macro 10))
  =&gt; (fn* ([] (clojure.core/* 1 2 3 4 5 6 7 8 9 10)))
 </code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defmacro factorial-function-macro [x]
