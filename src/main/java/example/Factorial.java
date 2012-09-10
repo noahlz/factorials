@@ -19,8 +19,10 @@ public class Factorial implements ValueComputer<Integer> {
     }
 
     public static int calculate(int n) {
-        int result = 1;
-        for (int i = 1; i <= n; i++) {
+        if(n == 1) return 1;
+
+        int result = 1; 
+        for (int i = n; i > 1; i--) {
             result *= i;
         }
         return result;
