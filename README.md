@@ -17,18 +17,18 @@ Approaches used to calculate factorials:
 1. Using `apply` `take` and `iterate`
 1. Using `reduce` and `range` but returning a `fn` (a "higher-order" factorial function)
 1. Using `defmacro` to create a function that always calculates the same factorial.
-1. Using `eval` `cons` and `range`
+1. Using `cons` `range` and `eval`
 1. Parallel computation using `future` `dosync` and `alter`
-1. Parallel computation using `agent` `send` and `await`
+1. Parallel computation using `ref` `agent` `send` and `await`
 1. Parallel computation using `reduce` and `pmap`
 1. Extremely convoluted parallel computation using `reduce` and `pvalues` (requiring a macro)
 1. Yet more convoluted parallel computation using `reduce` and `pcalls` (also requiring a macro)
-1. Using `letfn` to implement recursive computation, for use with `trampoline` (not mutually recursive, but still works).
+1. Using `trampoline` and mutually-recursive functions defined with `letfn`.
 1. Using `defmethod` `defmulti` and `defrecord` (plus `update-in` and `->`) for recursive computation.
 1. Using Java interop to call a Java class.
 1. Using Java interop, but with `->` to tame a goofy "Builder" pattern.
 1. Using `reify` to implement a pre-existing Java interface using one of our previous functions.
-1. Using `incanter.core/factorial` (DUH!)
+1. Using `incanter.core/factorial` (duh!)
 
 ### Hall of Shame
 
@@ -50,7 +50,8 @@ profile to use the lein-marginalia plugin and run `lein marg` to generate docume
 
 # GitHub Page
 
-This project also has a GitHub page hosting the generated Marginalia documentation.  Point your browser to
+This project also has a GitHub page hosting the generated Marginalia documentation (with some
+manual tweaks). Point your browser to
 
 [http://noahlz.github.com/factorials](http://noahlz.github.com/factorials)
 
