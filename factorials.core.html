@@ -3028,7 +3028,7 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>factorials -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#factorials.core" name="factorials.core"><h1 class="project-name">factorials.core</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Exploring Clojure with factorial computation.</h1>
+</script><title>Exploring Clojure with Factorial Computation</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#factorials.core" name="factorials.core"><h1 class="project-name">factorials.core</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Exploring Clojure with Factorial Computation</h2>
 
 <p><em>"<a href="http://github.com/noahlz/factorials">Fork me on on GitHub</a>!"</em></p>
 
@@ -3059,8 +3059,7 @@ to a
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-apply-iterate [n]
   (apply * (take n (iterate inc 1))))</pre></td></tr><tr><td class="docs"><h2>"Code is data, data is code"</h2>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Higher-order functions FTW.</p>
-
-<p>This returns a function that you can later call to compute
+</td><td class="codes"></td></tr><tr><td class="docs"><p>This returns a function that you can later call to compute
 a factorial value when needed.</p>
 
 <p>Usage:</p>
@@ -3070,19 +3069,31 @@ a factorial value when needed.</p>
 =&gt; 120
 </code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defn make-fac-function [n]
-  (fn [] (reduce * (range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><p><code>defmacro</code> generates Clojure code for a function that will calculate
+  (fn [] (reduce * (range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><p>Here we illustrate Clojure <a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a>
+using <code>eval</code> <code>cons</code> and <code>'</code> (quote).</p>
+
+<p>Our function is building a valid Clojure expression that we then <code>eval</code>. Here's
+how you would do it manually at the REPL:</p>
+
+<pre><code>(def fac5 (cons '* (range 1 6)))
+(println fac5)
+=&gt; (* 1 2 3 4 5)
+(eval fac5)
+=&gt; 120
+</code></pre>
+</td><td class="codes"><pre class="brush: clojure">(defn factorial-using-eval-and-cons [n]
+  (eval (cons '* (range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><p><code>defmacro</code> generates Clojure code for a function that will calculate
 a fixed factorial value on-demand.</p>
 
 <p>Similar to the previous function, but note the macro output.</p>
 
-<pre><code> (macroexpand `(factorial-function-macro 10))
- =&gt; (fn* ([] (clojure.core/* 1 2 3 4 5 6 7 8 9 10)))
+<pre><code> (macroexpand `(factorial-function-macro 5))
+ =&gt; (fn* ([] (clojure.core/* 1 2 3 4 5)))
 </code></pre>
+
+<p>(More information on the mysterious <code>fn*</code> <a href="http://stackoverflow.com/questions/10767305/what-is-fn-and-how-does-clojure-bootstrap">here</a>)</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro factorial-function-macro [n]
-  `(fn [] (* ~@(range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><p>Here we illustrate Clojure <a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a>
-using <code>eval</code> <code>cons</code> and <code>'</code> (quote)</p>
-</td><td class="codes"><pre class="brush: clojure">(defn factorial-using-eval-and-cons [n]
-  (eval (cons '* (range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><h2>Parallel Computation</h2>
+  `(fn [] (* ~@(range 1 (inc n)))))</pre></td></tr><tr><td class="docs"><h2>Parallel Computation</h2>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Using <code>future</code> <code>dosync</code> and <code>alter</code></p>
 
 <p><code>partition-all</code> is just fantastic, by the way.</p>
@@ -3109,10 +3120,9 @@ the <code>await</code> call at the end).</p>
     (doseq [p parts]
       (send result #(apply * % p)))
     (await result)
-    @result))</pre></td></tr><tr><td class="docs"><h3>pmap to the rescue.</h3>
+    @result))</pre></td></tr><tr><td class="docs"><h3>pmap to the Rescue</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>If the previous code looked arduous, never fear. Enter: <code>pmap</code></p>
-
-<p>Yes, it is <code>map</code> executed in parallel (lazily!) .</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Yes, it is <code>map</code> executed in parallel (lazily!) .</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-pmap-reduce [n psz]
   (let [parts (partition-all psz (range 1 (inc n)))
         sub-factorial-fn #(apply * %)]
@@ -3125,43 +3135,61 @@ the <code>await</code> call at the end).</p>
   (let [exprs (for [p (partition-all psz (range 1 (inc n)))]
                 (cons '* p))]
     `(fn [] (reduce * (pvalues ~@exprs)))))</pre></td></tr><tr><td class="docs"><p><code>pvalues</code> calls a collection of zero-arg functions in parallel to create a lazy sequence.
-Again, had to use <code>defmacro</code> to accomplish my goal.</p>
+Again, I had to use <code>defmacro</code> to accomplish my goal.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro factorial-using-pcalls-reduce [n psz]
   (let [exprs (for [p (partition-all psz (range 1 (inc n)))]
                 `(fn [] (* ~@p)))]
     `(fn [] (reduce * (pcalls ~@exprs)))))</pre></td></tr><tr><td class="docs"><h2>More Advanced Stuff</h2>
 </td><td class="codes"></td></tr><tr><td class="docs"><h3>Trampoline</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Here I used <code>letfn</code> to create a factorial function for use with <code>trampoline</code>.
-It's not exactly "mutually recursive" - but it works as intended.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Here, I've created a factorial function for use with <code>trampoline</code>.</p>
+
+<p>If you're not familiar with <code>trampoline</code>, it basically works like this:</p>
+
+<ol>
+<li><code>trampoline</code> calls the function you pass in.</li>
+<li>If your function returns a value, <code>trampoline</code> returns that value.</li>
+<li>However, if your function returns a function instance, <code>trampoline</code>
+calls that function.</li>
+<li>Repeat steps 2 and 3 until we finally get a non-function value.</li>
+</ol>
+
+<p>Example usage:</p>
 
 <pre><code>(trampoline (factorial-for-trampoline 5))
 =&gt; 120
 </code></pre>
+
+<p>A benefit of <code>trampoline</code> is that it allows mutual recursion between functions
+without overflow.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-for-trampoline [n]
   (letfn
-    [(next-fac-fn-or-value [limit previous-step previous-value]
-       (let [current-step (inc previous-step)
-             current-value (* current-step previous-value)]
+    [(next-fac-value [limit current-step previous-value]
+       (let [next-value (* current-step previous-value)]
          (if (= limit current-step)
-           current-value
-           #(next-fac-fn-or-value limit current-step current-value))))]
-    (next-fac-fn-or-value n 1 1)))</pre></td></tr><tr><td class="docs"><h3>Multimethods</h3>
+           next-value
+           #(next-fac-n limit current-step next-value))))
+     (next-fac-n [limit previous-step current-value]
+       #(next-fac-value limit (inc previous-step) current-value))]
+    (next-fac-value n 1 1)))</pre></td></tr><tr><td class="docs"><h3>Multimethods</h3>
 
 <p>I also thought of a way to compute a factorial using multimethods
-and some recursion.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>First define a "struct" (which actually becomes a full-fledged Java class)
-that has the fields <code>n</code> and <code>value</code></p>
+(and some recursion).</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>First define a "struct" that has the fields <code>n</code> and <code>value</code></p>
 
-<p>A tuple in the form of <code>{:n 1 :value 1}</code> would also have worked here, but (to be honest) I wanted to use
-<code>defrecord</code> in at least one of these examples.</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord Factorial [n value])</pre></td></tr><tr><td class="docs"><p>Define the root of the multimethod, which dispatches based on "true" or "false," where
-"false" means we reached the end of our factorial computation.</p>
+<p>(Yes, a tuple in the form of <code>{:n 1 :value 1}</code> would also have worked here, but (to be honest) I wanted to use
+<code>defrecord</code> in at least one of these examples)</p>
 
-<p>(Highly recommended: Jay Fields' terrific blog entry on
-<a href="http://blog.jayfields.com/2010/07/clojure-destructuring.html">Map Destructuring</a>)</p>
+<p>By the way, we actually just defined the Java class <code>factorials.core.Factorial</code></p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord Factorial [n value])</pre></td></tr><tr><td class="docs"><p>To define a multimethod, first you define the dispatch function with <code>defmulti</code>. Here
+our function dispatches on just two possible values: <code>true</code> or <code>false</code>, where "false"
+means we reached the end of our factorial computation.</p>
+
+<p>The function argument <code>{:keys [n]}</code> is actually an example of one of Clojures mini-languages,
+"destructuring." For more on that, see Jay Fields'
+<a href="http://blog.jayfields.com/2010/07/clojure-destructuring.html">terrific blog entry</a>.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti factorial-using-multimethods
   (fn ([limit] true)
-      ([limit {:keys [n]}] (&lt; n limit))))</pre></td></tr><tr><td class="docs"><p>Repeatedly dispatch to this method while <code>n &lt; limit</code></p>
+      ([limit {:keys [n]}] (&lt; n limit))))</pre></td></tr><tr><td class="docs"><p>Our multimethod repeatedly dispatches to this function while <code>n &lt; limit</code> (<code>true</code>)</p>
 
 <p>Note how I had to overload this method to initialize our <code>Factorial</code> struct on the first invocation.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmethod factorial-using-multimethods true
@@ -3169,32 +3197,33 @@ that has the fields <code>n</code> and <code>value</code></p>
   ([limit fac]
     (let [next-factorial (-&gt; fac (update-in [:n] inc)
                                  (update-in [:value] #(* % (:n fac))))]
-      (factorial-using-multimethods limit next-factorial))))</pre></td></tr><tr><td class="docs"><p>We hit this multimethod when our <code>Factorial</code> struct has the desired <code>:n</code> value.
-It returns the final factorial value with one last computation.</p>
+      (factorial-using-multimethods limit next-factorial))))</pre></td></tr><tr><td class="docs"><p>We hit the multimethod function for <code>false</code> when our <code>Factorial</code> struct has the desired <code>:n</code> value.
+It returns the final factorial value after one last computation.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmethod factorial-using-multimethods false
   ([limit fac] (* limit (:value fac))))</pre></td></tr><tr><td class="docs"><h2>Java Interop</h2>
-</td><td class="codes"></td></tr><tr><td class="docs"><h3>Calling a Java Class</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Elsewhere we wrote a plain old Java class with a static method that
 computes factorials.  We can still re-use that legacy code via Clojure's Java interop.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-javainterop [n]
-  (example.Factorial/calculate n))</pre></td></tr><tr><td class="docs"><h3>Taming Java Complexity</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>What if our Java team read <em>Effective Java, 2nd Ed.</em> and decided to use
+  (example.Factorial/calculate n))</pre></td></tr><tr><td class="docs"><p>But what if our Java team read <em>Effective Java, 2nd Ed.</em> and decided to use
 the Builder pattern?</p>
-
-<p>We can use the <code>-&gt;</code> operator (aka the "pipeline operator") to
+</td><td class="codes"></td></tr><tr><td class="docs"><p>We can use the <code>-&gt;</code> operator (aka the "pipeline operator") to
 get this under control.</p>
 
-<p>Note: <code>doto</code> works well for "JavaBean" classes having a large number of <code>void</code> "setters".</p>
+<p>And if you're working with <code>java.util.Map</code> instances or "JavaBeans" with copious "setters," there's the
+<code>doto</code> macro.</p>
 </td><td class="codes"><pre class="brush: clojure">(import 'example.Factorial$Builder)
 (defn factorial-using-javainterop-and-pipeline [n]
-  (-&gt; (Factorial$Builder.) (.factorial n) .build .compute))</pre></td></tr><tr><td class="docs"><h3>More on the Pipeline Macro</h3>
+  (-&gt; (Factorial$Builder.)
+      (.factorial n)
+      .build
+      .compute))</pre></td></tr><tr><td class="docs"><h3>More on the Pipeline Macro</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>I found <code>clojure.walk/macroexpand-all</code> really useful for understanding and debugging the <code>-&gt;</code> macro:</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Executing the following at the REPL</p>
 </td><td class="codes"><pre class="brush: clojure">(clojure.walk/macroexpand-all '(-&gt; (Factorial$Builder.) (.factorial n) .build .compute))</pre></td></tr><tr><td class="docs"><p>outputs</p>
 </td><td class="codes"><pre class="brush: clojure">=&gt; (. (. (. (new Factorial$Builder) factorial n) build) compute)</pre></td></tr><tr><td class="docs"><p>which is equivalent to</p>
-</td><td class="codes"><pre class="brush: clojure">=&gt; (.compute (.build (.factorial (example.Factorial$Builder.) n)))</pre></td></tr><tr><td class="docs"><h3>Implementing Java Interfaces</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>What if our Java team needs us to implement one of their API interfaces? Here
-we use <code>reify</code> to generate a Java class that implements the <code>example.ValueComputer</code> interface
+</td><td class="codes"><pre class="brush: clojure">=&gt; (.compute (.build (.factorial (example.Factorial$Builder.) n)))</pre></td></tr><tr><td class="docs"><h2>Implementing Java Interfaces</h2>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Perhaps our Java team, which doesn't use Clojure, needs us to implement one of their API interfaces.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Here we use <code>reify</code> to generate a Java class that implements the <code>example.ValueComputer</code> interface
 while re-using one of our functions for the implementation.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn newFactorialComputer [n]
   (reify example.ValueComputer
@@ -3202,13 +3231,14 @@ while re-using one of our functions for the implementation.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Why not just use <a href="http://incanter.org/">Incanter</a>? (Duh!)</p>
 </td><td class="codes"><pre class="brush: clojure">(require '[incanter.core :only factorial])
 (defn factorial-from-incanter [n]
-  (incanter.core/factorial n))</pre></td></tr><tr><td class="docs"><h1>Epilogue: HALL OF SHAME</h1>
+  (incanter.core/factorial n))</pre></td></tr><tr><td class="docs"><h2>Epilogue: HALL OF SHAME</h2>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Here are some functions I wrote that "work" but have hidden defects or are just plain wrong.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Note that <code>def</code> binds to the namespace, not the scope of the function.</p>
-
-<p>After calling <code>(factorial-using-do-dotimes 5)</code> you will have a var named <code>a</code> pointing to a value
+</td><td class="codes"></td></tr><tr><td class="docs"><h3>defs Aren't Variables</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>After calling <code>(factorial-using-do-dotimes 5)</code> you will have a var named <code>a</code> pointing to a value
 of <code>120</code>.  Unless another thread called the function concurrently, in which case who knows
-what happened.</p>
+what happened?</p>
+
+<p>This is because <code>def</code> binds to the namespace, not the scope of the function.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-do-dotimes [n]
   (do
     (def a 1)
@@ -3223,7 +3253,9 @@ Now you have two vars in your namespace: <code>a</code> and <code>res</code>.</p
     (while (&lt; a n)
       (def a (inc a))
       (def res (* res a)))
-    res))</pre></td></tr><tr><td class="docs"><p>An example using Atoms. I suspect one would never (mis-)use atoms locally-scoped like this.</p>
+    res))</pre></td></tr><tr><td class="docs"><h3>Abusing Atoms</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>An example using Atoms. I suspect one would never (ab)use atoms locally-scoped like this (although
+they work well for implementing <a href="http://www.nofluffjuststuff.com/blog/stuart_halloway/2009/08/rifle_oriented_programming_with_clojure">closures</a>).</p>
 
 <p>However, perhaps you could contrive an example using the <code>Factorial</code> struct from earlier and
 <code>compare-and-set!</code></p>
@@ -3232,8 +3264,9 @@ Now you have two vars in your namespace: <code>a</code> and <code>res</code>.</p
         res (atom 1)]
     (while (&gt; n @a)
       (swap! res * (swap! a inc)))
-    @res))</pre></td></tr><tr><td class="docs"><p>Finally, an attempt to compute a factorial using an <code>agent</code> that recursively
-submits computation tasks to itself</p>
+    @res))</pre></td></tr><tr><td class="docs"><h3>Recursive Agent Race Condition</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Finally, an attempt to compute a factorial using an <code>agent</code> that recursively
+submits computation tasks to itself.</p>
 
 <p>This approach sometimes fails due to a race condition between
 the recursive (and asychronous) <code>send-off</code> and the <code>await</code> call.</p>
