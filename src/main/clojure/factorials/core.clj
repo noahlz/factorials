@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; # Exploring Clojure with factorial computation.
+;; ## Exploring Clojure with Factorial Computation
 ;;
 ;; _"[Fork me on on GitHub](http://github.com/noahlz/factorials)!"_
 ;;
@@ -45,7 +45,7 @@
 ;; ## "Code is data, data is code"
 
 ;; Higher-order functions FTW.
-;;
+
 ;; This returns a function that you can later call to compute
 ;; a factorial value when needed.
 ;;
@@ -57,22 +57,31 @@
 (defn make-fac-function [n]
   (fn [] (reduce * (range 1 (inc n)))))
 
+;; Here we illustrate Clojure [homoiconicity](http://en.wikipedia.org/wiki/Homoiconicity)
+;; using `eval` `cons` and `'` (quote).
+;
+;; Our function is building a valid Clojure expression that we then `eval`. Here's
+;; how you would do it manually at the REPL:
+;;
+;;     (def fac5 (cons '* (range 1 6)))
+;;     (println fac5)
+;;     => (* 1 2 3 4 5)
+;;     (eval fac5)
+;;     => 120
+(defn factorial-using-eval-and-cons [n]
+  (eval (cons '* (range 1 (inc n)))))
+
 ;;`defmacro` generates Clojure code for a function that will calculate
 ;; a fixed factorial value on-demand.
 ;;
 ;; Similar to the previous function, but note the macro output.
 ;;
-;;      (macroexpand `(factorial-function-macro 10))
-;;      => (fn* ([] (clojure.core/* 1 2 3 4 5 6 7 8 9 10)))
+;;      (macroexpand `(factorial-function-macro 5))
+;;      => (fn* ([] (clojure.core/* 1 2 3 4 5)))
 ;;
-;; [More on the mysterious `fn*`, above](http://stackoverflow.com/questions/10767305/what-is-fn-and-how-does-clojure-bootstrap).
+;; (More information on the mysterious `fn*` [here](http://stackoverflow.com/questions/10767305/what-is-fn-and-how-does-clojure-bootstrap))
 (defmacro factorial-function-macro [n]
   `(fn [] (* ~@(range 1 (inc n)))))
-
-;; Here we illustrate Clojure [homoiconicity](http://en.wikipedia.org/wiki/Homoiconicity)
-; using `eval` `cons` and `'` (quote)
-(defn factorial-using-eval-and-cons [n]
-  (eval (cons '* (range 1 (inc n)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ## Parallel Computation
@@ -108,10 +117,10 @@
     @result))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ### pmap to the rescue.
+;; ### pmap to the Rescue
 
 ;; If the previous code looked arduous, never fear. Enter: `pmap`
-;;
+
 ;; Yes, it is `map` executed in parallel (lazily!) .
 (defn factorial-using-pmap-reduce [n psz]
   (let [parts (partition-all psz (range 1 (inc n)))
@@ -129,7 +138,7 @@
     `(fn [] (reduce * (pvalues ~@exprs)))))
 
 ;; `pvalues` calls a collection of zero-arg functions in parallel to create a lazy sequence.
-;; Again, had to use `defmacro` to accomplish my goal.
+;; Again, I had to use `defmacro` to accomplish my goal.
 (defmacro factorial-using-pcalls-reduce [n psz]
   (let [exprs (for [p (partition-all psz (range 1 (inc n)))]
                 `(fn [] (* ~@p)))]
@@ -142,23 +151,21 @@
 
 ;; Here, I've created a factorial function for use with `trampoline`.
 ;;
-;; The function itself defines two inline functions `letfn` - one to increment our
-;; factorial index, and another to actually calculate each incremental factorial value.
-;; These functions call each other ("mutual recursion") until `limit` == `n` at which point
-;; the inline function `next-fac-value` returns the final factorial value.
+;; If you're not familiar with `trampoline`, it basically works like this:
 ;;
-;; If you're not familiar with `trampoline`, basically it works like this:
 ;; 1. `trampoline` calls the function you pass in.
-;; 2. If your function returns a value, it returns that value.
-;; 3. However, if your function returns a function instance, it calls that function.
-;; 4. Continue steps 2 and 3 (maybe forever?) until we get a value.
-;;
-;; Bonus - it won't overflow.
+;; 2. If your function returns a value, `trampoline` returns that value.
+;; 3. However, if your function returns a function instance, `trampoline`
+;;    calls that function.
+;; 4. Repeat steps 2 and 3 until we finally get a non-function value.
 ;;
 ;; Example usage:
 ;;
 ;;     (trampoline (factorial-for-trampoline 5))
 ;;     => 120
+;;
+;; A benefit of `trampoline` is that it allows mutual recursion between functions
+;; without overflow.
 (defn factorial-for-trampoline [n]
   (letfn
     [(next-fac-value [limit current-step previous-value]
@@ -176,25 +183,28 @@
 ;; ### Multimethods
 ;;
 ;; I also thought of a way to compute a factorial using multimethods
-;; and some recursion.
+;; (and some recursion).
 
-;; First define a "struct" (which actually becomes a full-fledged Java class)
-;; that has the fields `n` and `value`
+;; First define a "struct" that has the fields `n` and `value`
 ;;
-;; A tuple in the form of `{:n 1 :value 1}` would also have worked here, but (to be honest) I wanted to use
-;; `defrecord` in at least one of these examples.
+;; (Yes, a tuple in the form of `{:n 1 :value 1}` would also have worked here, but (to be honest) I wanted to use
+;; `defrecord` in at least one of these examples)
+;;
+;; By the way, we actually just defined the Java class `factorials.core.Factorial`
 (defrecord Factorial [n value])
 
-;; Define the root of the multimethod, which dispatches based on "true" or "false," where
-;; "false" means we reached the end of our factorial computation.
+;; To define a multimethod, first you define the dispatch function with `defmulti`. Here
+;; our function dispatches on just two possible values: `true` or `false`, where "false"
+;; means we reached the end of our factorial computation.
 ;;
-;; (Highly recommended: Jay Fields' terrific blog entry on
-;; [Map Destructuring](http://blog.jayfields.com/2010/07/clojure-destructuring.html))
+;; The function argument `{:keys [n]}` is actually an example of one of Clojures mini-languages,
+;; "destructuring." For more on that, see Jay Fields'
+;; [terrific blog entry](http://blog.jayfields.com/2010/07/clojure-destructuring.html).
 (defmulti factorial-using-multimethods
   (fn ([limit] true)
       ([limit {:keys [n]}] (< n limit))))
 
-;; Repeatedly dispatch to this method while `n < limit`
+;; Our multimethod repeatedly dispatches to this function while `n < limit` (`true`)
 ;;
 ;; Note how I had to overload this method to initialize our `Factorial` struct on the first invocation.
 (defmethod factorial-using-multimethods true
@@ -204,37 +214,34 @@
                                  (update-in [:value] #(* % (:n fac))))]
       (factorial-using-multimethods limit next-factorial))))
 
-;; We hit this multimethod when our `Factorial` struct has the desired `:n` value.
-; It returns the final factorial value with one last computation.
+;; We hit the multimethod function for `false` when our `Factorial` struct has the desired `:n` value.
+;; It returns the final factorial value after one last computation.
 (defmethod factorial-using-multimethods false
   ([limit fac] (* limit (:value fac))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ## Java Interop
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ### Calling a Java Class
-
 ;; Elsewhere we wrote a plain old Java class with a static method that
 ;; computes factorials.  We can still re-use that legacy code via Clojure's Java interop.
 (defn factorial-using-javainterop [n]
   (example.Factorial/calculate n))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ### Taming Java Complexity
-
-;; What if our Java team read _Effective Java, 2nd Ed._ and decided to use
+;; But what if our Java team read _Effective Java, 2nd Ed._ and decided to use
 ;; the Builder pattern?
-;;
+
 ;; We can use the `->` operator (aka the "pipeline operator") to
 ;; get this under control.
 ;;
-;; Note: `doto` works well for "JavaBean" classes having a large number of `void` "setters".
+;; And if you're working with `java.util.Map` instances or "JavaBeans" with copious "setters," there's the
+;; `doto` macro.
 (import 'example.Factorial$Builder)
 (defn factorial-using-javainterop-and-pipeline [n]
-  (-> (Factorial$Builder.) (.factorial n) .build .compute))
+  (-> (Factorial$Builder.)
+      (.factorial n)
+      .build
+      .compute))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ### More on the Pipeline Macro
 
 ;; I found `clojure.walk/macroexpand-all` really useful for understanding and debugging the `->` macro:
@@ -253,10 +260,11 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ### Implementing Java Interfaces
+;; ## Implementing Java Interfaces
 
-;; What if our Java team needs us to implement one of their API interfaces? Here
-;; we use `reify` to generate a Java class that implements the `example.ValueComputer` interface
+;; Perhaps our Java team, which doesn't use Clojure, needs us to implement one of their API interfaces.
+
+;; Here we use `reify` to generate a Java class that implements the `example.ValueComputer` interface
 ;; while re-using one of our functions for the implementation.
 (defn newFactorialComputer [n]
   (reify example.ValueComputer
@@ -271,16 +279,17 @@
   (incanter.core/factorial n))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; # Epilogue: HALL OF SHAME
+;; ## Epilogue: HALL OF SHAME
 
 ;; Here are some functions I wrote that "work" but have hidden defects or are just plain wrong.
-;;
 
-;; Note that `def` binds to the namespace, not the scope of the function.
-;;
+;; ### defs Aren't Variables
+
 ;; After calling `(factorial-using-do-dotimes 5)` you will have a var named `a` pointing to a value
 ;; of `120`.  Unless another thread called the function concurrently, in which case who knows
-;; what happened.
+;; what happened?
+;;
+;; This is because `def` binds to the namespace, not the scope of the function.
 (defn factorial-using-do-dotimes [n]
   (do
     (def a 1)
@@ -299,7 +308,10 @@
       (def res (* res a)))
     res))
 
-;; An example using Atoms. I suspect one would never (mis-)use atoms locally-scoped like this.
+;; ### Abusing Atoms
+
+;; An example using Atoms. I suspect one would never (ab)use atoms locally-scoped like this (although
+;; they work well for implementing [closures](http://www.nofluffjuststuff.com/blog/stuart_halloway/2009/08/rifle_oriented_programming_with_clojure)).
 ;;
 ;; However, perhaps you could contrive an example using the `Factorial` struct from earlier and
 ;; `compare-and-set!`
@@ -310,8 +322,10 @@
       (swap! res * (swap! a inc)))
     @res))
 
+;; ### Recursive Agent Race Condition
+
 ;; Finally, an attempt to compute a factorial using an `agent` that recursively
-;; submits computation tasks to itself
+;; submits computation tasks to itself.
 ;;
 ;; This approach sometimes fails due to a race condition between
 ;; the recursive (and asychronous) `send-off` and the `await` call.
