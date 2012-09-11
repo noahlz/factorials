@@ -65,6 +65,7 @@
 ;;      (macroexpand `(factorial-function-macro 10))
 ;;      => (fn* ([] (clojure.core/* 1 2 3 4 5 6 7 8 9 10)))
 ;;
+;; [More on the mysterious `fn*`, above](http://stackoverflow.com/questions/10767305/what-is-fn-and-how-does-clojure-bootstrap).
 (defmacro factorial-function-macro [n]
   `(fn [] (* ~@(range 1 (inc n)))))
 
@@ -139,20 +140,37 @@
 
 ;; ### Trampoline
 
-;; Here I used `letfn` to create a factorial function for use with `trampoline`.
-;; It's not exactly "mutually recursive" - but it works as intended.
+;; Here, I've created a factorial function for use with `trampoline`.
+;;
+;; The function itself defines two inline functions `letfn` - one to increment our
+;; factorial index, and another to actually calculate each incremental factorial value.
+;; These functions call each other ("mutual recursion") until `limit` == `n` at which point
+;; the inline function `next-fac-value` returns the final factorial value.
+;;
+;; If you're not familiar with `trampoline`, basically it works like this:
+;; 1. `trampoline` calls the function you pass in.
+;; 2. If your function returns a value, it returns that value.
+;; 3. However, if your function returns a function instance, it calls that function.
+;; 4. Continue steps 2 and 3 (maybe forever?) until we get a value.
+;;
+;; Bonus - it won't overflow.
+;;
+;; Example usage:
 ;;
 ;;     (trampoline (factorial-for-trampoline 5))
 ;;     => 120
 (defn factorial-for-trampoline [n]
   (letfn
-    [(next-fac-fn-or-value [limit previous-step previous-value]
-       (let [current-step (inc previous-step)
-             current-value (* current-step previous-value)]
+    [(next-fac-value [limit current-step previous-value]
+       (let [next-value (* current-step previous-value)]
          (if (= limit current-step)
-           current-value
-           #(next-fac-fn-or-value limit current-step current-value))))]
-    (next-fac-fn-or-value n 1 1)))
+           next-value
+           #(next-fac-n limit current-step next-value))))
+
+     (next-fac-n [limit previous-step current-value]
+       #(next-fac-value limit (inc previous-step) current-value))]
+
+    (next-fac-value n 1 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ### Multimethods
