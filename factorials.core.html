@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="How many different ways can we calculate a factorial in Clojure?" name="description" /><style type="text/css">/**
+<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="Exploring Clojure with Factorial Computation" name="description" /><style type="text/css">/**
  * SyntaxHighlighter
  * http://alexgorbatchev.com/SyntaxHighlighter
  *
@@ -3140,7 +3140,23 @@ Again, I had to use <code>defmacro</code> to accomplish my goal.</p>
   (let [exprs (for [p (partition-all psz (range 1 (inc n)))]
                 `(fn [] (* ~@p)))]
     `(fn [] (reduce * (pcalls ~@exprs)))))</pre></td></tr><tr><td class="docs"><h2>More Advanced Stuff</h2>
-</td><td class="codes"></td></tr><tr><td class="docs"><h3>Trampoline</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><h3>Rolling Your Own Lazy Sequences</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>In simpler times, we used functions like <code>take</code> <code>range</code> and <code>iterate</code> to compute factorials.
+Under the covers, these functions create "lazy" sequences.</p>
+
+<p>In fact, we can cut out the
+middleman and compute a lazy sequence of factorials using <code>cons</code> and <code>lazy-seq</code></p>
+
+<p>I used <code>letfn</code> in order to define a "function-private" inline function to build our lazy sequence.
+I could have also defined <code>lazy-fac-seq</code> "externally" as a private function using <code>defn-</code></p>
+</td><td class="codes"><pre class="brush: clojure">(defn factorial-using-lazy-seq [n]
+  (letfn [(lazy-fac-seq
+            ([] (lazy-fac-seq 1 1))
+            ([n v]
+              (let [next-n (inc n)
+                    next-v (* n v)]
+                (cons v (lazy-seq (lazy-fac-seq next-n next-v))))))]
+    (nth (lazy-fac-seq) n)))</pre></td></tr><tr><td class="docs"><h3>Trampoline</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Here, I've created a factorial function for use with <code>trampoline</code>.</p>
 
 <p>If you're not familiar with <code>trampoline</code>, it basically works like this:</p>
@@ -3204,7 +3220,9 @@ It returns the final factorial value after one last computation.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Elsewhere we wrote a plain old Java class with a static method that
 computes factorials.  We can still re-use that legacy code via Clojure's Java interop.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-javainterop [n]
-  (example.Factorial/calculate n))</pre></td></tr><tr><td class="docs"><p>But what if our Java team read <em>Effective Java, 2nd Ed.</em> and decided to use
+  (example.Factorial/calculate n))</pre></td></tr><tr><td class="docs"><h3>Taming Java Complexity</h3>
+
+<p>But what if our Java team read <em>Effective Java, 2nd Ed.</em> and decided to use
 the Builder pattern?</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>We can use the <code>-&gt;</code> operator (aka the "pipeline operator") to
 get this under control.</p>
@@ -3216,12 +3234,12 @@ get this under control.</p>
   (-&gt; (Factorial$Builder.)
       (.factorial n)
       .build
-      .compute))</pre></td></tr><tr><td class="docs"><h3>More on the Pipeline Macro</h3>
+      .compute))</pre></td></tr><tr><td class="docs"><h4>More on the Pipeline Macro</h4>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>I found <code>clojure.walk/macroexpand-all</code> really useful for understanding and debugging the <code>-&gt;</code> macro:</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Executing the following at the REPL</p>
 </td><td class="codes"><pre class="brush: clojure">(clojure.walk/macroexpand-all '(-&gt; (Factorial$Builder.) (.factorial n) .build .compute))</pre></td></tr><tr><td class="docs"><p>outputs</p>
 </td><td class="codes"><pre class="brush: clojure">=&gt; (. (. (. (new Factorial$Builder) factorial n) build) compute)</pre></td></tr><tr><td class="docs"><p>which is equivalent to</p>
-</td><td class="codes"><pre class="brush: clojure">=&gt; (.compute (.build (.factorial (example.Factorial$Builder.) n)))</pre></td></tr><tr><td class="docs"><h2>Implementing Java Interfaces</h2>
+</td><td class="codes"><pre class="brush: clojure">=&gt; (.compute (.build (.factorial (example.Factorial$Builder.) n)))</pre></td></tr><tr><td class="docs"><h3>Implementing Java Interfaces</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Perhaps our Java team, which doesn't use Clojure, needs us to implement one of their API interfaces.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Here we use <code>reify</code> to generate a Java class that implements the <code>example.ValueComputer</code> interface
 while re-using one of our functions for the implementation.</p>
