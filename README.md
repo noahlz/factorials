@@ -1,4 +1,4 @@
-# Exploring Clojure with Factorials
+# Exploring Clojure with Factorial Computation
 
 This project demonstrates a variety of of [Clojure](http://clojure.org) language features
 and library functions using factorial computation as an example.
@@ -23,6 +23,7 @@ Approaches used to calculate factorials:
 1. Parallel computation using `reduce` and `pmap`
 1. Extremely convoluted parallel computation using `reduce` and `pvalues` (requiring a macro)
 1. Yet more convoluted parallel computation using `reduce` and `pcalls` (also requiring a macro)
+1. By getting the `nth` value from a `lazy-seq` of factorials.
 1. Using `trampoline` and mutually-recursive functions defined with `letfn`.
 1. Using `defmethod` `defmulti` and `defrecord` (plus `update-in` and `->`) for recursive computation.
 1. Using Java interop to call a Java class.
