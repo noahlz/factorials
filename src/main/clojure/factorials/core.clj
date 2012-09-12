@@ -159,11 +159,11 @@
 ;; I could have also defined `lazy-fac-seq` "externally" as a private function using `defn-`
 (defn factorial-using-lazy-seq [n]
   (letfn [(lazy-fac-seq
-            ([] (lazy-fac-seq 1 1))
-            ([n v]
-              (let [next-n (inc n)
-                    next-v (* n v)]
-                (cons v (lazy-seq (lazy-fac-seq next-n next-v))))))]
+             ([] (lazy-fac-seq 1 1))
+             ([n v]
+               (let [next-n (inc n)
+                     next-v (* n v)]
+                 (cons v (lazy-seq (lazy-fac-seq next-n next-v))))))]
     (nth (lazy-fac-seq) n)))
 
 ;; ### Trampoline
