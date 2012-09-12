@@ -149,19 +149,22 @@
 
 ;; ### Rolling Your Own Lazy Sequences
 
-;; In simpler times, we used `take` `range` and `iterate` to compute factorials.
-;; Under the covers, these functions create "lazy" sequences. It turns out we can
-;; cut out the middle-man and compute a lazy sequence of factorials using `cons` and `lazy-seq`
+;; In simpler times, we used functions like `take` `range` and `iterate` to compute factorials.
+;; Under the covers, these functions create "lazy" sequences.
 ;;
-;; I used `letfn` in order to define a private function to kick off our lazy sequence.
-;; Another way to define private functions is `defn-`
+;; In fact, we can cut out the
+; middleman and compute a lazy sequence of factorials using `cons` and `lazy-seq`
+;;
+;; I used `letfn` in order to define a "function-private" inline function to build our lazy sequence.
+;; I could have also defined `lazy-fac-seq` "externally" as a private function using `defn-`
 (defn factorial-using-lazy-seq [n]
-  (letfn [(start-lazy-fac-seq [] (lazy-fac-seq 1 1))
-           (lazy-fac-seq [n v]
-             (let [next-n (inc n)
-                   next-v (* n v)]
-               (cons v (lazy-seq (lazy-fac-seq next-n next-v)))))]
-    (nth (start-lazy-fac-seq) n)))
+  (letfn [(lazy-fac-seq
+            ([] (lazy-fac-seq 1 1))
+            ([n v]
+              (let [next-n (inc n)
+                    next-v (* n v)]
+                (cons v (lazy-seq (lazy-fac-seq next-n next-v))))))]
+    (nth (lazy-fac-seq) n)))
 
 ;; ### Trampoline
 
@@ -243,6 +246,7 @@
 (defn factorial-using-javainterop [n]
   (example.Factorial/calculate n))
 
+;; ### Taming Java Complexity
 ;; But what if our Java team read _Effective Java, 2nd Ed._ and decided to use
 ;; the Builder pattern?
 
@@ -258,7 +262,7 @@
       .build
       .compute))
 
-;; ### More on the Pipeline Macro
+;; #### More on the Pipeline Macro
 
 ;; I found `clojure.walk/macroexpand-all` really useful for understanding and debugging the `->` macro:
 
@@ -276,7 +280,7 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ## Implementing Java Interfaces
+;; ### Implementing Java Interfaces
 
 ;; Perhaps our Java team, which doesn't use Clojure, needs us to implement one of their API interfaces.
 
