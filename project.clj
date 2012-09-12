@@ -1,5 +1,6 @@
 (defproject factorials "0.1.0"
   :description "How many different ways can we calculate a factorial in Clojure?"
+  :repl-options { :init (use 'factorials.core) }
   :source-paths ["src/main/clojure"]
   :java-source-paths ["src/main/java"]
   :test-paths ["src/test/clojure"]
