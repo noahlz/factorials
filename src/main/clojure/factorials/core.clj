@@ -147,6 +147,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ## More Advanced Stuff
 
+;; ### Rolling Your Own Lazy Sequences
+
+;; In simpler times, we used `take` `range` and `iterate` to compute factorials.
+;; Under the covers, these functions create "lazy" sequences. It turns out we can
+;; cut out the middle-man and compute a lazy sequence of factorials using `cons` and `lazy-seq`
+;;
+;; I used `letfn` in order to define a private function to kick off our lazy sequence.
+;; Another way to define private functions is `defn-`
+(defn factorial-using-lazy-seq [n]
+  (letfn [(start-lazy-fac-seq [] (lazy-fac-seq 1 1))
+           (lazy-fac-seq [n v]
+             (let [next-n (inc n)
+                   next-v (* n v)]
+               (cons v (lazy-seq (lazy-fac-seq next-n next-v)))))]
+    (nth (start-lazy-fac-seq) n)))
+
 ;; ### Trampoline
 
 ;; Here, I've created a factorial function for use with `trampoline`.

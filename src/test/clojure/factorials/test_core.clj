@@ -20,6 +20,7 @@
       (is (== fac (factorial-using-pmap-reduce 5 2)))
       (is (== fac ((factorial-using-pvalues-reduce 5 2)))) ;; macro
       (is (== fac ((factorial-using-pcalls-reduce 5 2)))) ;; macro
+      (is (== fac (factorial-using-lazy-seq 5)))
       (is (== fac (trampoline (factorial-for-trampoline 5))))
       (is (== fac (factorial-using-multimethods 5)))
       (is (== fac (factorial-using-javainterop 5)))
