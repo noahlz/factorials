@@ -58,7 +58,8 @@ manual tweaks). Point your browser to
 
 # License
 
-Public Domain. See http://unlicense.org/ for more information.
+Creative Commons CC0 1.0 Universal 
+See: http://creativecommons.org/publicdomain/zero/1.0/legalcode
 
 Noah Zucker (nzucker@gmail.com / [@noahlz](http://twitter.com/noahlz))
 
