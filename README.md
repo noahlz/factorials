@@ -58,7 +58,7 @@ manual tweaks). Point your browser to
 
 # License
 
-I haven't decided on an OSS license (do projects like this really need one?). Eclipse Public License, maybe?
+Public Domain. See http://unlicense.org/ for more information.
 
-Copyright 2012 Noah Zucker (nzucker@gmail.com / [@noahlz](http://twitter.com/noahlz))
+Noah Zucker (nzucker@gmail.com / [@noahlz](http://twitter.com/noahlz))
 
