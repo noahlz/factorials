@@ -152,19 +152,25 @@
 ;; In simpler times, we used functions like `take` `range` and `iterate` to compute factorials.
 ;; Under the covers, these functions create "lazy" sequences.
 ;;
-;; In fact, we can cut out the
-; middleman and compute a lazy sequence of factorials using `cons` and `lazy-seq`
-;;
-;; I used `letfn` in order to define a "function-private" inline function to build our lazy sequence.
-;; I could have also defined `lazy-fac-seq` "externally" as a private function using `defn-`
+;; In fact, we can cut out the middleman and compute a lazy sequence of
+;; factorials using `cons` and `lazy-seq`
+
+;; I find "top-down" style to be more readable, so I forward-declare my function that
+;; generates the lazy seq.
+(declare facseq)
+
+;; We use `nth` to grab the target factorial value from the sequence.
 (defn factorial-using-lazy-seq [n]
-  (letfn [(lazy-fac-seq
-             ([] (lazy-fac-seq 1 1))
-             ([n v]
-               (let [next-n (inc n)
-                     next-v (* n v)]
-                 (cons v (lazy-seq (lazy-fac-seq next-n next-v))))))]
-    (nth (lazy-fac-seq) n)))
+  (nth (facseq) n))
+
+;; Finally, the function to generate the lazy factorial sequence. In this case,
+;; I've made it private to the namespace with `defn-`.
+(defn- facseq
+  ([] (facseq 1 1))
+  ([n v]
+    (let [next-n (inc n)
+          next-v (* n v)]
+      (cons v (lazy-seq (facseq next-n next-v))))))
 
 ;; ### Trampoline
 
