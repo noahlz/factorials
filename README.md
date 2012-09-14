@@ -26,6 +26,7 @@ Approaches used to calculate factorials:
 1. By getting the `nth` value from a `lazy-seq` of factorials.
 1. Using `trampoline` and mutually-recursive functions defined with `letfn`.
 1. Using `defmethod` `defmulti` and `defrecord` (plus `update-in` and `->`) for recursive computation.
+1. Using a Java primitive array and `areduce`
 1. Using Java interop to call a Java class.
 1. Using Java interop, but with `->` to tame a goofy "Builder" pattern.
 1. Using `reify` to implement a pre-existing Java interface using one of our previous functions.

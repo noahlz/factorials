@@ -245,6 +245,27 @@
   ([limit fac] (* limit (:value fac))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ### Using Arrays
+
+;; Clojure also supports operating on arrays, for when you absolutely,
+;; positively need performance (at the expense of immutability).
+;;
+;; `long-array` creates a Java `long` primitive array, and the functions
+;; `aset-long` `aget` and `areduce` operate upon it.
+;;
+;; (Of course, this approach requires allocating and initializing an
+;; array of size `n`. The real point is to illustrate using Clojure
+;; array functions, not performance).
+(defn factorial-using-areduce [n]
+  (let [arr (long-array n)]
+    (dotimes [i n]
+      (aset-long arr i (inc i)))
+    (areduce arr
+             idx
+             ret (long 1)
+      (* ret (aget arr idx)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ## Java Interop
 
 ;; Elsewhere we wrote a plain old Java class with a static method that

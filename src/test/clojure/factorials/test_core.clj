@@ -23,6 +23,7 @@
       (is (== fac (factorial-using-lazy-seq 5)))
       (is (== fac (trampoline (factorial-for-trampoline 5))))
       (is (== fac (factorial-using-multimethods 5)))
+      (is (== fac (factorial-using-areduce 5)))
       (is (== fac (factorial-using-javainterop 5)))
       (is (== fac (factorial-using-javainterop-and-pipeline 5)))
       (is (== fac (-> (newFactorialComputer 5) .compute)))
