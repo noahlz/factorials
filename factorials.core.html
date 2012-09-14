@@ -3218,7 +3218,24 @@ means we reached the end of our factorial computation.</p>
       (factorial-using-multimethods limit next-factorial))))</pre></td></tr><tr><td class="docs"><p>We hit the multimethod function for <code>false</code> when our <code>Factorial</code> struct has the desired <code>:n</code> value.
 It returns the final factorial value after one last computation.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmethod factorial-using-multimethods false
-  ([limit fac] (* limit (:value fac))))</pre></td></tr><tr><td class="docs"><h2>Java Interop</h2>
+  ([limit fac] (* limit (:value fac))))</pre></td></tr><tr><td class="docs"><h3>Using Arrays</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Clojure also supports operating on arrays, for when you absolutely,
+positively need performance (at the sacrifice of immutability).</p>
+
+<p><code>long-array</code> creates a Java <code>long</code> primitive array, and the functions
+<code>aset-long</code> <code>aget</code> and <code>areduce</code> operate upon it.</p>
+
+<p>(Of course, this approach requires allocating and initializing an
+array of size <code>n</code>. The real point is to illustrate Clojure
+array functions, not performance).</p>
+</td><td class="codes"><pre class="brush: clojure">(defn factorial-using-areduce [n]
+  (let [arr (long-array n)]
+    (dotimes [i n]
+      (aset-long arr i (inc i)))
+    (areduce arr
+             idx
+             ret (long 1)
+      (* ret (aget arr idx)))))</pre></td></tr><tr><td class="docs"><h2>Java Interop</h2>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Elsewhere we wrote a plain old Java class with a static method that
 computes factorials.  We can still re-use that legacy code via Clojure's Java interop.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn factorial-using-javainterop [n]
