@@ -55,7 +55,7 @@ profile to use the lein-marginalia plugin and run `lein marg` to generate docume
 This project also has a GitHub page hosting the generated Marginalia documentation (with some
 manual tweaks). Point your browser to
 
-[http://noahlz.github.com/factorials](http://noahlz.github.com/factorials)
+[http://noahlz.github.io/factorials](http://noahlz.github.io/factorials)
 
 # License
 
