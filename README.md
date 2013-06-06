@@ -59,7 +59,7 @@ manual tweaks). Point your browser to
 
 ## Continuous Integration
 
-![Build Status](https://travis-ci.org/noahlz/factorials.png?branch=master)
+[![Build Status](https://travis-ci.org/noahlz/factorials.png?branch=master)](http://travis-ci.org/noahlz/factorials)
 
 CI is hosted by [travis-ci.org](http://travis-ci.org)
 
