@@ -57,6 +57,12 @@ manual tweaks). Point your browser to
 
 [http://noahlz.github.io/factorials](http://noahlz.github.io/factorials)
 
+# Continuous Integration
+
+![Build Status](https://travis-ci.org/noahlz/factorials.png?branch=master)
+
+CI is hosted by [travis-ci.org](http://travis-ci.org)
+
 # License
 
 Creative Commons CC0 1.0 Universal 
