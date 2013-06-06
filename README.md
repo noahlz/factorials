@@ -41,7 +41,7 @@ Buggy or just wrong functions that still "work."
 1. (Mis-)using `while` `atom` and `swap` (not precisesly defective, but not a good use of Atoms).
 1. An attempt with `agent` and recursive `send-off` calls, which often fails due to a race condition with `await`
 
-# Building
+## Building
 
 This project builds with [Leiningen 2](https://github.com/technomancy/leiningen). Note that it includes some Java sources (for the interop examples).
 
@@ -50,20 +50,20 @@ Running `lein test` or `lein repl` will compile said Java sources.
 Also, the source code comments are formatted for [Marginalia](http://fogus.me/fun/marginalia/). Configure your
 profile to use the lein-marginalia plugin and run `lein marg` to generate documentation.
 
-# GitHub Page
+## GitHub Page
 
 This project also has a GitHub page hosting the generated Marginalia documentation (with some
 manual tweaks). Point your browser to
 
 [http://noahlz.github.io/factorials](http://noahlz.github.io/factorials)
 
-# Continuous Integration
+## Continuous Integration
 
 ![Build Status](https://travis-ci.org/noahlz/factorials.png?branch=master)
 
 CI is hosted by [travis-ci.org](http://travis-ci.org)
 
-# License
+## License
 
 Creative Commons CC0 1.0 Universal 
 
