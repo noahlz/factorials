@@ -5,5 +5,4 @@
   :java-source-paths ["src/main/java"]
   :test-paths ["src/test/clojure"]
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [incanter/incanter-core "1.5.0-SNAPSHOT"]])
-
+                 [incanter/incanter-core "1.5.1"]])
